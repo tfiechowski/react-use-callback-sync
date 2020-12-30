@@ -1,5 +1,5 @@
 import { uniqueId } from 'lodash';
-import { useContext, useEffect, useRef } from 'react';
+import { useCallback, useContext, useEffect, useRef } from 'react';
 import { CallbacksSyncContext } from './Context';
 
 export function useCallbacksSync({
@@ -14,14 +14,20 @@ export function useCallbacksSync({
     CallbacksSyncContext
   );
 
+  const handleRemoveCallback = useCallback(() => {
+    removeCallback(callbackId.current);
+  }, [removeCallback]);
+
   useEffect(() => {
     addCallback(callbackId.current, callback);
 
-    return () => removeCallback(callbackId.current);
-  }, [callback]);
+    return () => handleRemoveCallback();
+  }, [callback, addCallback]);
 
-  return async () => {
-    await callback();
-    await sync();
+  return {
+    sync: async () => {
+      await callback();
+      await sync();
+    },
   };
 }

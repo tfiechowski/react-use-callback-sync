@@ -64,7 +64,7 @@ describe('useCallbackSync', () => {
 
     expect(callback).not.toHaveBeenCalled();
 
-    await result.current();
+    await result.current.sync();
 
     expect(callback).toHaveBeenCalledTimes(1);
   });
