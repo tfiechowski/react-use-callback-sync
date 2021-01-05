@@ -9,16 +9,21 @@ function CallbacksRenderer({
   id,
   callback,
   group,
+  immediate,
 }: {
   id: string;
   callback: Function;
   group: string;
+  immediate: boolean;
 }) {
   const { removeCallback, sync } = useCallbackSync({ id, callback, group });
 
   return (
     <div>
-      <button data-testid={`sync-${group}-${id}`} onClick={() => sync()} />
+      <button
+        data-testid={`sync-${group}-${id}`}
+        onClick={() => sync(immediate)}
+      />
       <button
         data-testid={`remove-${group}-${id}`}
         onClick={() => removeCallback()}
@@ -27,7 +32,13 @@ function CallbacksRenderer({
   );
 }
 
-function Wrapper({ callbacksTree }: { callbacksTree: ICallbacksTree }) {
+function Wrapper({
+  callbacksTree,
+  immediate = true,
+}: {
+  callbacksTree: ICallbacksTree;
+  immediate?: boolean;
+}) {
   return (
     <CallbackSyncProvider>
       {Object.entries(callbacksTree).map(([group, callbacks]) =>
@@ -37,6 +48,7 @@ function Wrapper({ callbacksTree }: { callbacksTree: ICallbacksTree }) {
             id={id}
             group={group}
             callback={callback}
+            immediate={immediate}
           />
         ))
       )}
@@ -81,6 +93,49 @@ describe('useCallbackSync', () => {
     await result.current.sync();
 
     expect(callback).toHaveBeenCalledTimes(1);
+  });
+
+  it('should wait for callback to finish before syncing the group', async () => {
+    jest.useFakeTimers();
+    const callback1 = jest.fn();
+    const callback1B = jest.fn();
+    const callback2 = jest.fn();
+
+    const handleWaiter = () => {
+      return new Promise(resolve => {
+        callback1();
+
+        setTimeout(() => {
+          callback1B();
+          resolve(null);
+        }, 3000);
+      });
+    };
+    const callbacks = {
+      default: {
+        '1': handleWaiter,
+        '2': callback2,
+      },
+    };
+    const { getByTestId } = render(
+      <Wrapper immediate={false} callbacksTree={callbacks} />
+    );
+
+    expect(callback1).not.toHaveBeenCalled();
+    expect(callback1B).not.toHaveBeenCalled();
+    expect(callback2).not.toHaveBeenCalled();
+
+    await fireEvent.click(getByTestId('sync-default-1'));
+
+    expect(callback1).toHaveBeenCalledTimes(1);
+    expect(callback1B).not.toHaveBeenCalled();
+    expect(callback2).not.toHaveBeenCalled();
+
+    await jest.advanceTimersByTime(4000);
+
+    expect(callback1).toHaveBeenCalledTimes(1);
+    expect(callback1B).toHaveBeenCalledTimes(1);
+    expect(callback2).toHaveBeenCalledTimes(1);
   });
 
   it('doesnt break on empty callback list', async () => {

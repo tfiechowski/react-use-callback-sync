@@ -25,8 +25,13 @@ export function useCallbackSync({
   }, [callback, addCallback, group, handleRemoveCallback]);
 
   return {
-    sync: async () => {
-      await sync(group);
+    sync: async (immediate: boolean = false) => {
+      if (immediate) {
+        sync({ group });
+      } else {
+        await callback();
+        sync({ group, omitIds: [callbackId.current] });
+      }
     },
     removeCallback: handleRemoveCallback,
   };

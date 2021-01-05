@@ -12,6 +12,11 @@ export interface ICallbacksTree {
   [group: string]: ICallbacks;
 }
 
+export interface SyncOptions {
+  group?: string;
+  omitIds?: Array<string>;
+}
+
 interface ICallbacksContext {
   addCallback: ({
     id,
@@ -23,7 +28,7 @@ interface ICallbacksContext {
     group?: string;
   }) => void;
   removeCallback: (id: string) => void;
-  sync: (group?: string) => void;
+  sync: (options?: SyncOptions) => void;
 }
 
 function getDefaultState(): ICallbacksContext {
@@ -68,11 +73,13 @@ export function CallbackSyncProvider({ children }: { children: any }) {
   );
 
   const sync = useCallback(
-    (group = DEFAULT_GROUP_NAME) => {
+    ({ group, omitIds = [] }) => {
       const groupCallbacks = callbacks[group] || {};
-      Object.values(groupCallbacks).forEach(callback => {
-        callback();
-      });
+      Object.entries(groupCallbacks)
+        .filter(([id]) => !omitIds.includes(id))
+        .forEach(([_, callback]) => {
+          callback();
+        });
     },
     [callbacks]
   );
