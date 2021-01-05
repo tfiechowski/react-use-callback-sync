@@ -61,7 +61,7 @@ describe('useCallbackSync', () => {
     group        | name
     ${undefined} | ${'default'}
     ${'custom'}  | ${'custom'}
-  `('calls callback on sync for $name group', async ({ group }) => {
+  `('should fire callbacks on sync for $name group', async ({ group }) => {
     const callback = jest.fn();
     const wrapper = ({ children }: { children: any }) => (
       <CallbackSyncProvider>{children}</CallbackSyncProvider>
@@ -78,7 +78,7 @@ describe('useCallbackSync', () => {
     expect(callback).toHaveBeenCalledTimes(1);
   });
 
-  it('calls callback on sync', async () => {
+  it('should fire callback on sync', async () => {
     const callback = jest.fn();
     const wrapper = ({ children }: { children: any }) => (
       <CallbackSyncProvider>{children}</CallbackSyncProvider>
@@ -138,11 +138,7 @@ describe('useCallbackSync', () => {
     expect(callback2).toHaveBeenCalledTimes(1);
   });
 
-  it('doesnt break on empty callback list', async () => {
-    render(<Wrapper callbacksTree={{}} />);
-  });
-
-  it('syncs callback between two components', async () => {
+  it('should sync callbacks between two components', async () => {
     const callback1 = jest.fn();
     const callback2 = jest.fn();
     const callbacks = {
@@ -162,7 +158,7 @@ describe('useCallbackSync', () => {
     expect(callback2).toHaveBeenCalled();
   });
 
-  it('not calling removed callback', async () => {
+  it('should not call removed callback', async () => {
     const callback1 = jest.fn();
     const callback2 = jest.fn();
     const callbacks = {
@@ -188,30 +184,40 @@ describe('useCallbackSync', () => {
     expect(callback2).toHaveBeenCalledTimes(1);
   });
 
-  it('only calls callback from specified group', () => {
-    const callback1 = jest.fn();
-    const callback2 = jest.fn();
+  it('should only call callbacks from specified group', () => {
+    const callback1A = jest.fn();
+    const callback1B = jest.fn();
+    const callback2A = jest.fn();
+    const callback2B = jest.fn();
     const callbacks = {
       default: {
-        '1': callback1,
+        '1a': callback1A,
+        '1b': callback1B,
       },
       extra: {
-        '2': callback2,
+        '2a': callback2A,
+        '2b': callback2B,
       },
     };
     const { getByTestId } = render(<Wrapper callbacksTree={callbacks} />);
 
-    expect(callback1).not.toHaveBeenCalled();
-    expect(callback2).not.toHaveBeenCalled();
+    expect(callback1A).not.toHaveBeenCalled();
+    expect(callback1B).not.toHaveBeenCalled();
+    expect(callback2A).not.toHaveBeenCalled();
+    expect(callback2B).not.toHaveBeenCalled();
 
-    fireEvent.click(getByTestId('sync-default-1'));
+    fireEvent.click(getByTestId('sync-default-1a'));
 
-    expect(callback1).toHaveBeenCalledTimes(1);
-    expect(callback2).toHaveBeenCalledTimes(0);
+    expect(callback1A).toHaveBeenCalledTimes(1);
+    expect(callback1B).toHaveBeenCalledTimes(1);
+    expect(callback2A).toHaveBeenCalledTimes(0);
+    expect(callback2B).toHaveBeenCalledTimes(0);
 
-    fireEvent.click(getByTestId('sync-extra-2'));
+    fireEvent.click(getByTestId('sync-extra-2b'));
 
-    expect(callback1).toHaveBeenCalledTimes(1);
-    expect(callback2).toHaveBeenCalledTimes(1);
+    expect(callback1A).toHaveBeenCalledTimes(1);
+    expect(callback1B).toHaveBeenCalledTimes(1);
+    expect(callback2A).toHaveBeenCalledTimes(1);
+    expect(callback2B).toHaveBeenCalledTimes(1);
   });
 });
