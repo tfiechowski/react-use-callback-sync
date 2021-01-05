@@ -2,7 +2,7 @@
 import { fireEvent, render } from '@testing-library/react';
 import { renderHook } from '@testing-library/react-hooks';
 import * as React from 'react';
-import { CallbacksSyncProvider, useCallbacksSync } from '../src';
+import { CallbacksSyncProvider, useCallbackSync } from '../src';
 import { ICallbacksTree } from '../src/Context';
 
 function CallbacksRenderer({
@@ -14,7 +14,7 @@ function CallbacksRenderer({
   callback: Function;
   group: string;
 }) {
-  const { removeCallback, sync } = useCallbacksSync({ id, callback, group });
+  const { removeCallback, sync } = useCallbackSync({ id, callback, group });
 
   return (
     <div>
@@ -26,6 +26,7 @@ function CallbacksRenderer({
     </div>
   );
 }
+
 function Wrapper({ callbacksTree }: { callbacksTree: ICallbacksTree }) {
   return (
     <CallbacksSyncProvider>
@@ -54,7 +55,7 @@ describe('useCallbackSync', () => {
       <CallbacksSyncProvider>{children}</CallbacksSyncProvider>
     );
     const { result } = renderHook(
-      () => useCallbacksSync({ id: '1', callback, group }),
+      () => useCallbackSync({ id: '1', callback, group }),
       { wrapper }
     );
 
@@ -71,7 +72,7 @@ describe('useCallbackSync', () => {
       <CallbacksSyncProvider>{children}</CallbacksSyncProvider>
     );
     const { result } = renderHook(
-      () => useCallbacksSync({ id: '1', callback }),
+      () => useCallbackSync({ id: '1', callback }),
       { wrapper }
     );
 
@@ -144,7 +145,6 @@ describe('useCallbackSync', () => {
       },
     };
     const { getByTestId } = render(<Wrapper callbacksTree={callbacks} />);
-    // const input = getByTestId('callback-remove-id');
 
     expect(callback1).not.toHaveBeenCalled();
     expect(callback2).not.toHaveBeenCalled();
@@ -154,7 +154,6 @@ describe('useCallbackSync', () => {
     expect(callback1).toHaveBeenCalledTimes(1);
     expect(callback2).toHaveBeenCalledTimes(0);
 
-    // fireEvent.click(getByTestId('remove'));
     fireEvent.click(getByTestId('sync-extra-2'));
 
     expect(callback1).toHaveBeenCalledTimes(1);

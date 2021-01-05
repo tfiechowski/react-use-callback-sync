@@ -2,7 +2,7 @@ import { uniqueId } from 'lodash';
 import { useCallback, useContext, useEffect, useRef } from 'react';
 import { CallbacksSyncContext, DEFAULT_GROUP_NAME } from './Context';
 
-export function useCallbacksSync({
+export function useCallbackSync({
   id = uniqueId(),
   callback,
   group = DEFAULT_GROUP_NAME,
