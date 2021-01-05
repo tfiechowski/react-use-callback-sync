@@ -11,7 +11,7 @@ In some scenarios, you may want to synchronize some actions around the page. Som
 
 ## The solution
 
-This library let's you loosely connect pieces around the application and trigger all of them once one of them is triggered. For example, you may want to trigger data fetching once one button is clicked in a few places around your page.
+This library let's you loosely connect pieces around the application and trigger all of them once one of them is triggered. For example, you may want to trigger data fetching in a few places around your page once one button is clicked.
 
 In the following example, "Your shifts" are refetched once you click "Take this shifts" on the right (and the API request is succesfull).
 
