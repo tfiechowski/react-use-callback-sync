@@ -13,7 +13,9 @@ In some scenarios, you may want to synchronize some actions around the page. Som
 
 This library let's you loosely connect pieces around the application and trigger all of them once one of them is triggered. For example, you may want to trigger data fetching once one button is clicked in a few places around your page.
 
-![Synchronizing actions around the page][./callback-sync.gif]
+In the following example, "Your shifts" are updated once you click "Take this shifts" on the right.
+
+![Synchronizing actions around the page](./callback-sync.gif)
 
 ## Installation
 
