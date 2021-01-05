@@ -1,6 +1,11 @@
-import { uniqueId } from 'lodash';
 import { useCallback, useContext, useEffect, useRef } from 'react';
 import { CallbackSyncContext, DEFAULT_GROUP_NAME } from './Context';
+
+function uniqueId() {
+  return Math.random()
+    .toString(36)
+    .substr(2, 9);
+}
 
 export function useCallbackSync({
   id = uniqueId(),

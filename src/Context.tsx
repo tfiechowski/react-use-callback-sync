@@ -1,8 +1,9 @@
 import * as React from 'react';
-import { noop, unset, setWith } from 'lodash';
 import { createContext, useCallback, useState } from 'react';
 
 export const DEFAULT_GROUP_NAME = 'default';
+
+const noop = () => {};
 
 export interface ICallbacks {
   [id: string]: Function;
@@ -49,14 +50,21 @@ export function CallbackSyncProvider({ children }: { children: any }) {
 
   const addCallback = useCallback(
     ({ id, callback, group = DEFAULT_GROUP_NAME }) => {
-      setCallbacks(_callbacks =>
-        setWith(
-          Object.assign({}, _callbacks),
-          `${group}.${id}`,
-          callback,
-          Object
-        )
-      );
+      setCallbacks(_callbacks => {
+        const copy = Object.assign({}, _callbacks);
+        if (
+          copy[group] &&
+          typeof copy[group] === 'object' &&
+          copy[group] !== null
+        ) {
+          copy[group][id] = callback;
+        } else {
+          copy[group] = {
+            [id]: callback,
+          };
+        }
+        return copy;
+      });
     },
     [setCallbacks]
   );
@@ -65,7 +73,7 @@ export function CallbackSyncProvider({ children }: { children: any }) {
     (id: string, group: string = DEFAULT_GROUP_NAME) => {
       setCallbacks(_callbacks => {
         const copy = Object.assign({}, _callbacks);
-        unset(copy, `${group}.${id}`);
+        delete copy[group][id];
         return copy;
       });
     },
