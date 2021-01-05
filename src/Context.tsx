@@ -1,15 +1,29 @@
 import * as React from 'react';
-import { omit, noop } from 'lodash';
+import { noop, unset, setWith } from 'lodash';
 import { createContext, useCallback, useState } from 'react';
+
+export const DEFAULT_GROUP_NAME = 'default';
 
 export interface ICallbacks {
   [id: string]: Function;
 }
 
+export interface ICallbacksTree {
+  [group: string]: ICallbacks;
+}
+
 interface ICallbacksContext {
-  addCallback: (id: string, callback: Function) => void;
+  addCallback: ({
+    id,
+    callback,
+    group,
+  }: {
+    id: string;
+    callback: Function;
+    group?: string;
+  }) => void;
   removeCallback: (id: string) => void;
-  sync: () => void;
+  sync: (group?: string) => void;
 }
 
 function getDefaultState(): ICallbacksContext {
@@ -26,30 +40,42 @@ export const CallbacksSyncContext = createContext<ICallbacksContext>(
 
 // eslint-disable-next-line react/prop-types
 export function CallbacksSyncProvider({ children }: { children: any }) {
-  const [callbacks, setCallbacks] = useState<ICallbacks>({});
+  const [callbacks, setCallbacks] = useState<ICallbacksTree>({});
 
   const addCallback = useCallback(
-    (id, callback) => {
+    ({ id, callback, group = DEFAULT_GROUP_NAME }) => {
       setCallbacks(_callbacks =>
-        Object.assign({
-          ..._callbacks,
-          [id]: callback,
-        })
+        setWith(
+          Object.assign({}, _callbacks),
+          `${group}.${id}`,
+          callback,
+          Object
+        )
       );
     },
     [setCallbacks]
   );
 
   const removeCallback = useCallback(
-    id => {
-      setCallbacks(_callbacks => Object.assign({}, omit(_callbacks, [id])));
+    (id: string, group: string = DEFAULT_GROUP_NAME) => {
+      setCallbacks(_callbacks => {
+        const copy = Object.assign({}, _callbacks);
+        unset(copy, `${group}.${id}`);
+        return copy;
+      });
     },
     [setCallbacks]
   );
 
-  const sync = useCallback(() => {
-    Object.values(callbacks).forEach(callback => callback());
-  }, [callbacks]);
+  const sync = useCallback(
+    (group = DEFAULT_GROUP_NAME) => {
+      const groupCallbacks = callbacks[group] || {};
+      Object.values(groupCallbacks).forEach(callback => {
+        callback();
+      });
+    },
+    [callbacks]
+  );
 
   return (
     <CallbacksSyncContext.Provider
