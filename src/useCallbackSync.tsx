@@ -1,6 +1,6 @@
 import { uniqueId } from 'lodash';
 import { useCallback, useContext, useEffect, useRef } from 'react';
-import { CallbacksSyncContext, DEFAULT_GROUP_NAME } from './Context';
+import { CallbackSyncContext, DEFAULT_GROUP_NAME } from './Context';
 
 export function useCallbackSync({
   id = uniqueId(),
@@ -12,9 +12,7 @@ export function useCallbackSync({
   group?: string;
 }) {
   const callbackId = useRef(id);
-  const { addCallback, removeCallback, sync } = useContext(
-    CallbacksSyncContext
-  );
+  const { addCallback, removeCallback, sync } = useContext(CallbackSyncContext);
 
   const handleRemoveCallback = useCallback(() => {
     removeCallback(callbackId.current);

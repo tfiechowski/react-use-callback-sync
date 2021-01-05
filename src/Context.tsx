@@ -34,12 +34,12 @@ function getDefaultState(): ICallbacksContext {
   };
 }
 
-export const CallbacksSyncContext = createContext<ICallbacksContext>(
+export const CallbackSyncContext = createContext<ICallbacksContext>(
   getDefaultState()
 );
 
 // eslint-disable-next-line react/prop-types
-export function CallbacksSyncProvider({ children }: { children: any }) {
+export function CallbackSyncProvider({ children }: { children: any }) {
   const [callbacks, setCallbacks] = useState<ICallbacksTree>({});
 
   const addCallback = useCallback(
@@ -78,10 +78,8 @@ export function CallbacksSyncProvider({ children }: { children: any }) {
   );
 
   return (
-    <CallbacksSyncContext.Provider
-      value={{ addCallback, removeCallback, sync }}
-    >
+    <CallbackSyncContext.Provider value={{ addCallback, removeCallback, sync }}>
       {children}
-    </CallbacksSyncContext.Provider>
+    </CallbackSyncContext.Provider>
   );
 }

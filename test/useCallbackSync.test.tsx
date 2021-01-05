@@ -2,7 +2,7 @@
 import { fireEvent, render } from '@testing-library/react';
 import { renderHook } from '@testing-library/react-hooks';
 import * as React from 'react';
-import { CallbacksSyncProvider, useCallbackSync } from '../src';
+import { CallbackSyncProvider, useCallbackSync } from '../src';
 import { ICallbacksTree } from '../src/Context';
 
 function CallbacksRenderer({
@@ -29,7 +29,7 @@ function CallbacksRenderer({
 
 function Wrapper({ callbacksTree }: { callbacksTree: ICallbacksTree }) {
   return (
-    <CallbacksSyncProvider>
+    <CallbackSyncProvider>
       {Object.entries(callbacksTree).map(([group, callbacks]) =>
         Object.entries(callbacks as Object).map(([id, callback]) => (
           <CallbacksRenderer
@@ -40,7 +40,7 @@ function Wrapper({ callbacksTree }: { callbacksTree: ICallbacksTree }) {
           />
         ))
       )}
-    </CallbacksSyncProvider>
+    </CallbackSyncProvider>
   );
 }
 
@@ -52,7 +52,7 @@ describe('useCallbackSync', () => {
   `('calls callback on sync for $name group', async ({ group }) => {
     const callback = jest.fn();
     const wrapper = ({ children }: { children: any }) => (
-      <CallbacksSyncProvider>{children}</CallbacksSyncProvider>
+      <CallbackSyncProvider>{children}</CallbackSyncProvider>
     );
     const { result } = renderHook(
       () => useCallbackSync({ id: '1', callback, group }),
@@ -69,7 +69,7 @@ describe('useCallbackSync', () => {
   it('calls callback on sync', async () => {
     const callback = jest.fn();
     const wrapper = ({ children }: { children: any }) => (
-      <CallbacksSyncProvider>{children}</CallbacksSyncProvider>
+      <CallbackSyncProvider>{children}</CallbackSyncProvider>
     );
     const { result } = renderHook(
       () => useCallbackSync({ id: '1', callback }),

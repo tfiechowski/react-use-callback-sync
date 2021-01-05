@@ -1,2 +1,2 @@
-export { CallbacksSyncContext, CallbacksSyncProvider } from './Context';
+export { CallbackSyncContext, CallbackSyncProvider } from './Context';
 export { useCallbackSync } from './useCallbackSync';
