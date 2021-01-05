@@ -118,4 +118,4 @@ function Section() {
 }
 ```
 
-Now, clicking on either of "Click" buttons from `ComponentA` will trigged console log, but will not trigger an alert from `ComponentB`.
+Now, clicking on either of "Click" buttons from `ComponentA` will trigged console.log twice (from two occurences of `ComponentA`), but will not trigger an alert from `ComponentB`. On the contrary, clicking "Alert" from `ComponentB` will show one alarm as it's only component that uses `Rolling Stones` callback sync group.
